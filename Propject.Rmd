@@ -1,0 +1,18 @@
+---
+output:
+  pdf_document:
+  latex_engine: xelatex
+  word_document: default
+---
+```{r}
+##Data reading
+
+getwd()
+rawdata <- read.csv(file ='train.csv')
+pred<-read.csv(file ='test.csv')
+
+rawdata<-tibble::rowid_to_column(rawdata, "ID")
+rawdata[-c(which((rawdata$ID%in%pred$ro))),]
+```
+
+
