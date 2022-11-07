@@ -6,8 +6,6 @@ output:
 ---
 ```{r}
 ##Data reading
-
-getwd()
 rawdata <- read.csv(file ='train.csv')
 pred<-read.csv(file ='test.csv')
 
