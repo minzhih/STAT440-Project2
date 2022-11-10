@@ -5,6 +5,7 @@ Column information:
 each row of the training data indicates the results of an internet speed test conducted at a location in Canada
 
 V01 - avg_d_kbps: average download speed recorded
+
 V02 - avg_u_kbps: average upload speed recorded
 V03 - avg_lat_ms - average latency in (ms)
 V04 - test - number of test performed at the same time and location, that are then averaged together
