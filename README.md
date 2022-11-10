@@ -20,4 +20,4 @@ V07/V08/V09 - PRUID, CUID, DAUID - these are IDs related to the date and locatio
 
 V10 - SACTYPE - This is an indicator of how rural the area tested is.
 
-V11/V12/V13 - Further IDs related to how rural the area tested is
+V11/V12/V13/V14 - DA_POP, PCUID, PCTYPE, PCCLASS - Further IDs related to how rural the area tested is.
