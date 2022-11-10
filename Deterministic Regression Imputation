@@ -21,15 +21,16 @@ data_det$V07[is.na(data_det$V07)]= 0
 data_det$V08[is.na(data_det$V08)]= 0
 any(is.na(data_det))
 
-#evaluate the model - deterministic model
+#evaluate using mae
+
+value = rep(0,dim(valid)[1])
 for(i in 1:dim(valid)[1]){
   row = valid[i,1]
   col = valid[i,2]
   value = data_det[row,col]
 }
 mae = mean(abs(value - valid[,3]))
-
-#MAE gives approx. 0.7
+mae
 
 
 #impute the result into the test set
