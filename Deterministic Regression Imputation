@@ -44,4 +44,3 @@ for(i in 1:dim(test)[1]){
 
 
 
-#stochastic model is better when evaluated onto the valid set
