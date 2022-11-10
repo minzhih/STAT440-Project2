@@ -19,16 +19,15 @@ data_sto$V08[is.na(data_sto$V08)]= 0
 any(is.na(data_det))
 
 
+value = rep(0,dim(valid)[1])
 #evaluate the model - stochastic model
 for(i in 1:dim(valid)[1]){
   row = valid[i,1]
   col = valid[i,2]
-  value = data_sto[row,col]
+  value[i] = data_sto[row,col]
 }
 mae = mean(abs(value - valid[,3]))
 mae
-
-# MAE returns approx 0.63
 
 #impute the result into the test set
 for(i in 1:dim(test)[1]){
