@@ -1,0 +1,155 @@
+setwd("/Users/renachoi/Desktop/STAT 440/project2/data")
+train <- read.csv("train.csv")
+rawdata <- read.csv("train.csv")
+test <- read.csv("test.csv")
+valid <- read.csv("valid.csv")
+pred <- read.csv("pred.csv")
+
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V01[i])
+  if(n == TRUE){
+    meandata = c(train$V01[i+1],train$V01[i-1])
+    train$V01[i] = mean(meandata)
+    
+  }
+}
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V02[i])
+  if(n == TRUE){
+    meandata = c(train$V02[i+1],train$V02[i-1])
+    train$V02[i] = mean(meandata)
+    
+  }
+}
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V03[i])
+  if(n == TRUE){
+    meandata = c(train$V03[i+1],train$V03[i-1])
+    train$V03[i] = mean(meandata)
+    
+  }
+}
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V04[i])
+  if(n == TRUE){
+    meandata = c(train$V04[i+1],train$V04[i-1])
+    train$V04[i] = mean(meandata)
+  }
+}
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V05[i])
+  if(n == TRUE){
+    meandata = c(train$V05[i+1],train$V05[i-1])
+    train$V05[i] = mean(meandata)
+  }
+}
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V06[i])
+  if(n == TRUE){
+    meandata = c(train$V06[i+1],train$V06[i-1])
+    train$V06[i] = mean(meandata)
+    
+  }
+} 
+
+## Check the number of unique value
+length(unique(train$V07))
+#14
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V07[i])
+  if(n == TRUE){
+    meandata = c(train$V07[i+1],train$V07[i-1])
+    train$V07[i] = mean(meandata)
+    
+  }
+}
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V08[i])
+  if(n == TRUE){
+    meandata = c(train$V08[i+1],train$V08[i-1])
+    train$V08[i] = mean(meandata)
+    
+  }
+}
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V09[i])
+  if(n == TRUE){
+    meandata = c(train$V09[i+1],train$V09[i-1])
+    train$V09[i] = mean(meandata)
+    
+  }
+}
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V10[i])
+  if(n == TRUE){
+    meandata = c(train$V10[i+1],train$V10[i-1])
+    train$V10[i] = mean(meandata)
+  }
+}
+
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V11[i])
+  if(n == TRUE){
+    meandata = c(train$V11[i+1],train$V11[i-1])
+    train$V11[i] = mean(meandata)
+  }
+}
+
+#Deterministic regression 
+library(mice)
+
+imp_det <- mice(train, method = "norm.predict", m = 1) # Impute data
+data_det <- complete(imp_det) # Store data
+
+#remove the na if it is still missing after imputation
+any(is.na(data_det))
+any(is.na(data_det$V01))
+any(is.na(data_det$V02))
+any(is.na(data_det$V03))
+any(is.na(data_det$V04))
+any(is.na(data_det$V05))
+any(is.na(data_det$V06))
+any(is.na(data_det$V07))
+any(is.na(data_det$V08))
+data_det$V08[is.na(data_det$V08)]= 0
+any(is.na(data_det$V09))
+any(is.na(data_det$V10))
+any(is.na(data_det$V11))
+any(is.na(data_det$V12))
+any(is.na(data_det$V13))
+any(is.na(data_det$V14))
+
+#evaluate the model - deterministic model
+value = rep(0,dim(valid)[1])
+for(i in 1:dim(valid)[1]){
+  row = valid[i,1]
+  col = valid[i,2]
+  value[i] = data_det[row,col]
+}
+mae = mean(abs(value - valid[,3]))
+mae
+
+#impute the result into the test set
+for(i in 1:dim(test)[1]){
+  row = test[i,1]
+  col= test[i,2]
+  value = data_det[row,col]
+  test[i,3] = value
+  pred[i, 2] = value
+  #cat(sprintf("%d:%s,%f\n",row,col,value))
+}
+
+
+write.table(pred, file = "pred_v2.csv",
+            sep = ',',
+            quote = FALSE,
+            row.names = FALSE)
+
