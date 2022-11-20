@@ -1,0 +1,178 @@
+---
+output:
+  pdf_document:
+  latex_engine: xelatex
+  word_document: default
+---
+```{r}
+##Data reading
+train <- read.csv("train.csv")
+rawdata <- read.csv("train.csv")
+test <- read.csv("test.csv")
+valid <- read.csv("valid.csv")
+pred <- read.csv("pred.csv")
+```
+
+```{r,options(digits=30)}
+##EDA ## ignore this part
+## Correlation view
+cor(na.omit(rawdata))
+
+## Pattern overview
+for(i in index7)
+{
+  print(c(rawdata[1823222-3,7],rawdata[1823222-2,7],rawdata[i-1,7],rawdata[i,7],rawdata[i+1,7],rawdata[i+2,7],rawdata[1823222+3,7]))
+}
+
+index8<-pred[pred$co%in%"V08",1]
+
+for(i in index8)
+{
+  print(c(rawdata[1823222-3,8],rawdata[1823222-2,8],rawdata[i-1,8],rawdata[i,8],rawdata[i+1,8],rawdata[i+2,8],rawdata[1823222+3,8]))
+}
+
+index9<-pred[pred$co%in%"V09",1]
+
+for(i in index9)
+{
+  print(c(rawdata[i-2,9],rawdata[i-1,9],rawdata[i,9],rawdata[i+1,9],rawdata[i+2,9]))
+}
+
+## Scatterplot view
+plot(rawdata$V01[sample(20000)])
+plot(rawdata$V02[sample(20000)])
+plot(rawdata$V03[sample(20000)])
+plot(rawdata[sample(nrow(rawdata),size=50000),4])
+plot(rawdata[sample(nrow(rawdata),size=50000),5])
+plot(rawdata[sample(nrow(rawdata),size=50000),6])
+plot(rawdata[sample(nrow(rawdata),size=50000),7])
+plot(rawdata[sample(nrow(rawdata),size=50000),8])
+plot(rawdata[sample(nrow(rawdata),size=50000),9])
+plot(rawdata[sample(nrow(rawdata),size=50000),10])
+plot(rawdata[sample(nrow(rawdata),size=50000),11])
+plot(rawdata[sample(nrow(rawdata),size=50000),12])
+plot(rawdata[sample(nrow(rawdata),size=50000),13])
+plot(rawdata[sample(nrow(rawdata),size=50000),14])
+
+## From this find that we could hard code V6
+## Maybe V13 and V14
+
+#343585  missing value precentgae 0.05927753
+length(unique(rawdata[,1]))
+#203848 missing value percentage 0.05800548
+length(unique(rawdata[,2]))
+#2413   missing value percentage 0.0594956
+length(unique(rawdata[,3]))
+#929   missing value percentage 0.05975001
+length(unique(rawdata[,4]))
+#331   missing value percentage 0.05811452
+length(unique(rawdata[,5]))
+#4     missing value percentage 0.0579328
+length(unique(rawdata[,6]))
+#14    0.05931388
+length(unique(rawdata[,7]))
+#294   0.0604769
+length(unique(rawdata[,8]))
+#44063 0.0576057
+length(unique(rawdata[,9]))
+#9  0.05698784
+length(unique(rawdata[,10]))
+#890 0.837118
+length(unique(rawdata[,11]))
+#999 54.50135
+length(unique(rawdata[,12]))
+#5   54.50335
+length(unique(rawdata[,13]))
+#4   54.50349
+length(unique(rawdata[,14]))
+```
+
+```{r}
+##Hard coding
+##V6 checking, see if all the missing value are between two same values
+index6<-pred[gsub(".*:","",pred$Id)%in%"V06",1]
+index6<-gsub(":.*","",index6)
+index6<-as.numeric(index6)
+dataa <- matrix(ncol=2, nrow=length(index6))
+index<-which(is.na(rawdata$V06))
+#a<-0
+## V6 free now 
+for(i in index)
+{
+  #print(c(rawdata[i-3,6],rawdata[i-2,6],rawdata[i-1,6],rawdata[i,6],rawdata[i+1,6],rawdata[i+2,6],rawdata[i+3,6]))
+  if(rawdata[i-2,6]==rawdata[i+2,6])
+  {
+    rawdata[i,6]<-rawdata[i-2,6]
+    #a=a+1
+  }
+}
+
+## Reorder data by time 
+rawdata<-rawdata[order(rawdata$V06,decreasing=FALSE),]
+rawdata<-rawdata[order(rawdata$V13,decreasing=FALSE),]
+rawdata<-rawdata[order(rawdata$V14,decreasing=FALSE),]
+rawdata<-rawdata[order(rawdata$V09,decreasing=FALSE),]
+##Best blocking I could obtain now
+##1439  a  (with using V14 for reordering)
+##1442  a  (without using V14 for reordering)
+##1568  length(index)
+index10<-pred[gsub(".*:","",pred$Id)%in%"V10",1]
+index10<-gsub(":.*","",index10)
+index10<-as.numeric(index10)
+dataa <- matrix(ncol=2, nrow=length(index10))
+index<-which(is.na(rawdata$V10))
+## V10 free now 
+for(i in index)
+{
+   if(!(is.na(rawdata[i-1,10]==rawdata[i+1,10])))
+   {
+     rawdata[i,10]<-rawdata[i-1,10]
+   }
+  else{
+     rawdata[i,10]<-rawdata[i-2,10]
+     rawdata[i-1,10]<-rawdata[i-2,10]
+  }
+}
+
+rawdata<-rawdata[order(rawdata$V10,decreasing=FALSE),]
+
+
+index14<-pred[gsub(".*:","",pred$Id)%in%"V14",1]
+index14<-gsub(":.*","",index14)
+index14<-as.numeric(index14)
+index<-which(is.na(rawdata$V14))
+##Imputed the inbetween values first
+for(i in index)
+{
+  ##Before 1499644 
+  if(((!is.na(rawdata[i-1,14]))&(!is.na(rawdata[i-2,14]))&(!is.na(rawdata[i+1,14]))&(!is.na(rawdata[i+2,14]))))
+  {
+    rawdata[i,14]<-rawdata[i-1,14]
+  }
+  ##After 1499043; 601 imputed
+}  
+
+#index2<-which(!is.na(rawdata$V14))
+
+#for(i in index2[1:350])
+#{
+ # if((index2[i]+1)==index2[i+1])
+#  {
+#    index2<-index2[-1]
+#  }
+#}
+
+#index2[-c(index2[1],index2[1+1])]
+
+#for(i in index[sample(1:length(index),500)])
+#{
+#  print(c(rawdata[i-3,14],rawdata[i-2,14],rawdata[i-1,14],rawdata[i,14],rawdata[i+1,14],rawdata[i+2,14],rawdata#[i+3,14]))
+#}
+
+longestNAstrech(rawdata$V14)
+
+u10<-unique(rawdata$V10)
+data<-rawdata[rawdata[,10]%in%u10[5],]
+unique(data$V10)
+unique(data$V14)
+```
