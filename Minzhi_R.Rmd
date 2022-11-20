@@ -152,27 +152,48 @@ for(i in index)
   ##After 1499043; 601 imputed
 }  
 
-#index2<-which(!is.na(rawdata$V14))
 
-#for(i in index2[1:350])
-#{
- # if((index2[i]+1)==index2[i+1])
-#  {
-#    index2<-index2[-1]
-#  }
-#}
+## Got the non NA index which are not continuous
+index2<-which(!is.na(rawdata$V14))
+new<-vector()
+for(i in c(1:(length(index2)-1)) )
+{
+  if((index2[i]+1)!=index2[i+1])
+  {
+    new<-append(new,c(index2[i],index2[i+1]))
+  }
+}
 
-#index2[-c(index2[1],index2[1+1])]
+index<-c(1:(length(new)-1))
+new2<-vector()
+for(i in index)
+{
+  if(rawdata[new[i],14]==rawdata[new[i+1],14])
+  {
+    new2<-append(new2,c(new[i],new[i+1]))
+  }
+}
+new2<-unique(new2)
 
-#for(i in index[sample(1:length(index),500)])
-#{
-#  print(c(rawdata[i-3,14],rawdata[i-2,14],rawdata[i-1,14],rawdata[i,14],rawdata[i+1,14],rawdata[i+2,14],rawdata#[i+3,14]))
-#}
 
-longestNAstrech(rawdata$V14)
+index<-c(1:(length(new2)-1))
+for(i in index)
+{
+  rawdata[(new2[i]:new2[i+1]),14]<-rawdata[(new2[i]),14]
+}
 
-u10<-unique(rawdata$V10)
-data<-rawdata[rawdata[,10]%in%u10[5],]
-unique(data$V10)
-unique(data$V14)
+##There is still One NA
+#sum(is.na(rawdata$V14))
+
+##See which one 
+#which(is.na(rawdata$V14))
+
+##Imputed V14
+rawdata$V14[2751464]<-rawdata$V14[2751464-1]
+
+##Spot check all imputed
+sum(is.na(rawdata$V14))
+sum(is.na(rawdata$V10))
+sum(is.na(rawdata$V06))
+
 ```
