@@ -16,7 +16,7 @@ V05 - devices - this is the type of device that was tested (mobile, pc, laptop)
 
 V06 - year - the year in which the test was performed
 
-V07/V08/V09 - PRUID, CUID, DAUID - these are IDs related to the date and location
+V07/V08/V09 - PRUID (Province 2 digit id), CDUID (Census division id), DAUID (Dissemination area id) - these are IDs related to the date and location
 
 V10 - SACTYPE - This is an indicator of how rural the area tested is.
 
