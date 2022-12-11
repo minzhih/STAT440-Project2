@@ -1,4 +1,5 @@
 # STAT440 Project 2 
+Note: The Final_R_Code.Rmd produce the highest imputation accuary
 
 Column information:
 
