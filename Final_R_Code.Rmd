@@ -1,0 +1,509 @@
+---
+output:
+  pdf_document:
+  latex_engine: xelatex
+  word_document: default
+---
+```{r}
+train<- read.csv("train.csv")
+test <- read.csv("test.csv")
+valid <- read.csv("valid.csv")
+pred <- read.csv("pred.csv")
+##Find the nearest filled value
+f1 <- function(dat) {
+  N <- length(dat)
+  na.pos <- which(is.na(dat))
+  if (length(na.pos) %in% c(0, N)) {
+	return(dat)
+  }
+  non.na.pos <- which(!is.na(dat))
+  intervals  <- findInterval(na.pos, non.na.pos,
+                         	all.inside = TRUE)
+  left.pos   <- non.na.pos[pmax(1, intervals)]
+  right.pos  <- non.na.pos[pmin(N, intervals+1)]
+  left.dist  <- na.pos - left.pos
+  right.dist <- right.pos - na.pos
+ 
+  dat[na.pos] <- ifelse(left.dist <= right.dist,
+                    	dat[left.pos], dat[right.pos])
+  return(dat)
+}
+##V06 - year
+train$V06 <- f1(train$V06)
+ 
+#Accuracy
+index<-valid[valid$co%in%"V06",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V06",3]
+a<-0
+for(i in id){
+  if(train[index[i],"V06"]==value[i]){
+	a=a+1
+  }
+}
+a/length(index)
+
+##V13 - PCTYPE - Population Centre type
+  values <- unique(train$V13)
+ 
+  for(i in 1:length(values)){
+	if(any(is.na(train[train$V13%in%values[i],13])) == TRUE){
+  	print(paste(i,"out of",length(values)))
+  	print(values[i])
+  	print(unique(train[train$V13%in%values[i],13]))
+     
+  	if (length(unique(train[train$V13%in%values[i],13]))==2){
+    	NonNAindex <- which(!is.na(train[train$V13%in%values[i],13]))
+    	firstNonNA <- min(NonNAindex)
+    	R <- train[train$V13%in%values[i],13][firstNonNA]
+    	NAindex <- which(is.na(train[train$V13%in%values[i],13]))
+    	train[train$V13%in%values[i],13][NAindex] <- R
+     
+  	}
+	}
+  }
+ 
+train$V13 <- f1(train$V13)
+ 
+any(is.na(train$V13))
+ 
+index<-valid[valid$co%in%"V13",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V13",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V13"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+
+##V07 - PRUID - Province 2 digit ID
+##V07
+for(i in 1:nrow(train)){
+  n <-  is.na(train$V07[i])
+  if(n == TRUE){
+    if(isTRUE(train$V07[i-1] == train$V07[i+1])){
+      train$V07[i] = train$V07[i-1]
+    }
+    else{
+      C7 <- rep(0,4)
+      R7 <- c(train$V07[i-2],train$V07[i-1],train$V07[i+1],train$V07[i+2])
+      R8 <- c(train$V08[i-2],train$V08[i-1],train$V08[i+1],train$V08[i+2])
+      for(j in 1:length(R7)){
+        C7[j] <- abs(R8[j]-train$V08[i])
+      }
+      train$V07[i] = R7[which.min(C7)]
+    }
+  }
+}
+any(is.na(train$V07))
+ 
+#Accuracy
+index<-valid[valid$co%in%"V07",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V07",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V07"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+
+##V08 - CDUID - Census division ID
+unique(train$V07)
+length(unique(train$V07))
+ 
+values <- unique(train$V07)
+ 
+  for(i in 1:length(values)){
+   
+	if(any(is.na(train[train$V07%in%values[i],8])) == TRUE){
+  	print(paste(i,"out of",length(values)))
+  	print(values[i])
+  	print(unique(train[train$V07%in%values[i],8]))
+  	if (length(unique(train[train$V07%in%values[i],8]))==2){
+    	NonNAindex <- which(!is.na(train[train$V07%in%values[i],8]))
+    	firstNonNA <- min(NonNAindex)
+    	R <- train[train$V07%in%values[i],8][firstNonNA]
+    	NAindex <- which(is.na(train[train$V07%in%values[i],8]))
+    	train[train$V07%in%values[i],8][NAindex] <- R
+  		}
+ 	}
+  }
+ 
+train$V08 = f1(train$V08)
+ 
+any(is.na(train$V08))
+ 
+index<-valid[valid$co%in%"V08",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V08",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V08"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+
+##V09 - DAUID - Dissemination area ID
+  values <- unique(train$V11) #Unique V09 values
+  for(i in 1:length(values)){
+   
+	if(any(is.na(train[train$V11%in%values[i],9])) == TRUE){
+  	print(paste(i,"out of",length(values)))
+  	print(values[i])
+  	print(unique(train[train$V11%in%values[i],9])) #Unique V11 values for each V09 value.
+     
+  	if (length(unique(train[train$V11%in%values[i],9]))==2){
+    	NonNAindex <- which(!is.na(train[train$V11%in%values[i],9]))
+    	firstNonNA <- min(NonNAindex)
+    	R <- train[train$V11%in%values[i],9][firstNonNA] #Store first non-NA value as replacement.
+    	NAindex <- which(is.na(train[train$V11%in%values[i],9]))
+    	train[train$V11%in%values[i],9][NAindex] <- R #Replace NAs with replacement.
+  	}
+	} else if (length(unique(train[train$V11%in%values[i],9]))>2){
+   	NonNAindex <- which(!is.na(train[train$V11%in%values[i],9]))
+   	R <- mean(train[train$V11%in%values[i],9][NonNAindex]) #Store the mean V11 value as replacement.
+   	NAindex <- which(is.na(train[train$V11%in%values[i],9]))
+   	train[train$V11%in%values[i],9][NAindex] <- R #Replace NAs with replacement.
+	  }
+	}
+ 
+ 
+ 
+train$V09 = f1(train$V09)
+ 
+any(is.na(train$V09))
+ 
+index<-valid[valid$co%in%"V09",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V09",3]
+a<-0
+for(i in id ){
+  if(isTRUE(round(train[index[i],"V09"],4)==round(value[i],4)))
+  {
+	a=a+1
+  }
+}
+a/length(index)
+
+##V14 - PCCLASS - Population Centre class
+  values <- unique(train$V13)
+ 
+  for(i in 1:length(values)){
+   
+	if(any(is.na(train[train$V13%in%values[i],14])) == TRUE){
+  	print(paste(i,"out of",length(values)))
+  	print(values[i])
+  	print(unique(train[train$V13%in%values[i],14]))
+  	if (length(unique(train[train$V13%in%values[i],14]))==2){
+    	NonNAindex <- which(!is.na(train[train$V13%in%values[i],14]))
+    	firstNonNA <- min(NonNAindex)
+    	R <- train[train$V13%in%values[i],14][firstNonNA]
+    	NAindex <- which(is.na(train[train$V13%in%values[i],14]))
+    	train[train$V13%in%values[i],14][NAindex] <- R
+     
+  		}
+    	}
+  }
+ 
+train$V14 <- f1(train$V14)
+ 
+any(is.na(train$V14))
+ 
+index<-valid[valid$co%in%"V14",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V14",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V14"]==value[i]))
+  {
+	a=a+1
+  }
+}
+a/length(index)
+##V12 - PCUID - Population Centre ID
+ values <- unique(train$V13)
+ 
+  for(i in 1:length(values)){
+   
+	if(any(is.na(train[train$V13%in%values[i],12])) == TRUE){
+  	print(paste(i,"out of",length(values)))
+  	print(values[i])
+  	print(unique(train[train$V13%in%values[i],12]))
+     
+  	if (length(unique(train[train$V13%in%values[i],12]))==2){
+    	NonNAindex <- which(!is.na(train[train$V13%in%values[i],12]))
+    	firstNonNA <- min(NonNAindex)
+    	R <- train[train$V13%in%values[i],12][firstNonNA]
+    	NAindex <- which(is.na(train[train$V13%in%values[i],12]))
+    	train[train$V13%in%values[i],12][NAindex] <- R
+     
+  	}
+	}
+  }
+train$V12 <- f1(train$V12)
+ 
+any(is.na(train$V12))
+ 
+index<-valid[valid$co%in%"V12",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V12",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V12"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+##V11 - DAPOP - Dissemination area population, integer or NaN
+  values <- unique(train$V09) #Unique V09 values
+ 
+  for(i in 1:length(values)){
+ 
+	if(any(is.na(train[train$V09%in%values[i],11])) == TRUE){
+  	print(paste(i,"out of",length(values)))
+ 	 print(values[i]) #Print current unique V09 value.
+  	print(unique(train[train$V09%in%values[i],11])) #Unique V11 values for each V09 value.
+  	if (length(unique(train[train$V09%in%values[i],11]))==2){
+   	NonNAindex <- which(!is.na(train[train$V09%in%values[i],11]))
+   	firstNonNA <- min(NonNAindex)
+   	R <- train[train$V09%in%values[i],11][firstNonNA] #Store first non-NA value as replacement.
+   	NAindex <- which(is.na(train[train$V09%in%values[i],11]))
+   	train[train$V09%in%values[i],11][NAindex] <- R #Replace NAs with replacement.
+  	} else if (length(unique(train[train$V09%in%values[i],11]))>2){
+   	NonNAindex <- which(!is.na(train[train$V09%in%values[i],11]))
+   	R <- mean(train[train$V09%in%values[i],11][NonNAindex]) #Store the mean V11 value as replacement.
+   	NAindex <- which(is.na(train[train$V09%in%values[i],11]))
+   	train[train$V09%in%values[i],11][NAindex] <- R #Replace NAs with replacement.
+  	}
+	}
+  }
+ 
+train$V11 <-  f1(train$V11)
+any(is.na(train$V11))
+ 
+index<-valid[valid$co%in%"V11",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V11",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V11"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+##V10 - SACTYPE - Statistical area classification
+train$V10 <- f1(train$V10)
+index<-valid[valid$co%in%"V10",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V10",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V10"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+##V09 - DAUID - Dissemination area ID; imputing V09 agian
+train$V09 <- rawdata$V09
+ 
+  values <- unique(train$V11) #Unique V09 values
+  
+  for(i in 1:length(values)){
+   
+	if(any(is.na(train[train$V11%in%values[i],9])) == TRUE){
+	  print(paste(i,"out of",length(values)))
+  	print(values[i])
+  	print(unique(train[train$V11%in%values[i],9])) #Unique V11 values for each V09 value.
+     
+  	if (length(unique(train[train$V11%in%values[i],9]))==2){
+    	NonNAindex <- which(!is.na(train[train$V11%in%values[i],9]))
+    	firstNonNA <- min(NonNAindex)
+    	R <- train[train$V11%in%values[i],9][firstNonNA] #Store first non-NA value as replacement.
+    	NAindex <- which(is.na(train[train$V11%in%values[i],9]))
+    	train[train$V11%in%values[i],9][NAindex] <- R #Replace NAs with replacement.
+  	}
+	} else if (length(unique(train[train$V11%in%values[i],9]))>2){
+   	NonNAindex <- which(!is.na(train[train$V11%in%values[i],9]))
+   	R <- mean(train[train$V11%in%values[i],9][NonNAindex]) #Store the mean V11 value as replacement.
+   	NAindex <- which(is.na(train[train$V11%in%values[i],9]))
+   	train[train$V11%in%values[i],9][NAindex] <- R #Replace NAs with replacement.
+	  }
+	}
+ 
+ 
+train$V09 = f1(train$V09)
+ 
+any(is.na(train$V09))
+ 
+index<-valid[valid$co%in%"V09",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V09",3]
+a<-0
+for(i in id ){
+  if(isTRUE(train[index[i],"V09"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+##V1, V2, V3
+library(gbm)
+library(tibble)
+library(dplyr)
+set.seed(291122)
+data.train <- na.omit(train) #Rows without any NA.
+data.valid <- train[rowSums(is.na(train)) > 0,] #Rows containing NA.
+cols = c('V01','V02','V03')
+for (col in cols){
+  print(paste0("Currently imputing ", col))
+    max.trees = 1000
+    if (col=="V01"){
+      fit.b.best = gbm(V01~., data=data.train, distribution='gaussian', n.trees=max.trees, bag.fraction=0.8)
+    } else if (col=="V02"){
+      fit.b.best = gbm(V02~., data=data.train, distribution='gaussian', n.trees=max.trees, bag.fraction=0.8)
+    } else if (col=="V03"){
+      fit.b.best = gbm(V03~., data=data.train, distribution='gaussian', n.trees=max.trees, bag.fraction=0.8)
+    }
+    n.trees = gbm.perf(fit.b.best, plot.it=T)*2
+    if(n.trees>max.trees){
+      extra.trees=n.trees-max.trees
+      fit.b.best=gbm.more(fit.b.best, extra.trees)
+    }
+    if (col=="V01"){
+      pred.b.V01 = predict(fit.b.best, data.valid, na.action=NULL) #na.action=null means predict can work even if new data contains NAs.
+    } else if (col=="V02"){
+      pred.b.V02 = predict(fit.b.best, data.valid, na.action=NULL)
+    } else if (col=="V03"){
+      pred.b.V03 = predict(fit.b.best, data.valid, na.action=NULL)
+    }
+}
+write(pred.b.V01, "V01GBM")
+write(pred.b.V02, "V02GBM")
+write(pred.b.V03, "V03GBM")
+data.valid<-data.valid %>%
+	rownames_to_column("index")
+data.valid$index<-as.numeric(data.valid$index)
+NAV1index<-data.valid[which(is.na(data.valid$V01)),1]
+NAV2index<-data.valid[which(is.na(data.valid$V02)),1]
+NAV3index<-data.valid[which(is.na(data.valid$V03)),1]
+data.valid<-data.valid[,-1]
+#Read in three files generate by the above code 
+data <- read.table("V01GBM.txt", sep = "" , header = F ,stringsAsFactors= F)
+data2 <- read.table("V02GBM.txt", sep = "" , header = F ,stringsAsFactors= F)
+data3 <- read.table("V03GBM.txt", sep = "" , header = F ,stringsAsFactors= F)
+imputedV1<-as.vector(rbind(data$V1,data$V2,data$V3,data$V4,data$V5))
+imputedV2<-as.vector(rbind(data2$V1,data2$V2,data2$V3,data2$V4,data2$V5))
+imputedV3<-as.vector(rbind(data3$V1,data3$V2,data3$V3,data3$V4,data3$V5))
+index<-which(is.na(data.valid$V01))
+for(i in index)
+{
+ data.valid[i,1]<-imputedV1[i]
+}
+index2<-which(is.na(data.valid$V02))
+for(i in index2)
+{
+ data.valid[i,2]<-imputedV2[i]
+}
+index3<-which(is.na(data.valid$V03))
+for(i in index3)
+{
+ data.valid[i,3]<-imputedV3[i]
+}
+sum(is.na(data.valid[,1])) ## Check if imputed or not
+sum(is.na(data.valid[,2])) ## Check if imputed or not
+sum(is.na(data.valid[,3])) ## Check if imputed or not
+ 
+## Replace imputed data back to train dataset by matched index
+for (i in 1:length(NAV1index))
+{
+  train[NAV1index[i],1]<-data.valid[index[i],1]
+}
+ 
+for (i in 1:length(NAV2index))
+{
+  train[NAV2index[i],2]<-data.valid[index2[i],2]
+}
+ 
+for (i in 1:length(NAV3index))
+{
+  train[NAV3index[i],3]<-data.valid[index3[i],3]
+}
+##V4, V5
+library(mice)
+data_imp <- mice(train, method="norm.predict",m=5)
+data_det <- complete(data_imp)
+any(is.na(data_det))
+ 
+index<-valid[valid$co%in%"V04",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V04",3]
+a<-0
+for(i in id ){
+  if(isTRUE(data_det[index[i],"V04"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+ 
+index<-valid[valid$co%in%"V05",1]
+id<-c(1:length(index))
+value<-valid[valid$co%in%"V05",3]
+a<-0
+for(i in id ){
+  if(isTRUE(data_det[index[i],"V05"]==value[i]))
+  {
+	a=a+1
+  }
+}
+ 
+a/length(index)
+##Conclusion
+#evaluate the model
+value = rep(0,dim(valid)[1])
+ 
+for(i in 1:dim(valid)[1]){
+  row = valid[i,1]
+  col = valid[i,2]
+  value[i] = data_det [row,col]
+}
+mae = mean(abs(value - valid[,3]))
+mae
+ 
+#impute the result into the test set
+for(i in 1:dim(test)[1]){
+  row = test[i,1]
+  col= test[i,2]
+  value = data_det[row,col]
+  test[i,3] = value
+  pred[i, 2] = value
+  #cat(sprintf("%d:%s,%f\n",row,col,value))
+}
+ 
+ 
+write.table(pred, file = "pred.csv",
+	        sep = ',',
+        	quote = FALSE,
+        	row.names = FALSE)
+```
+
+
