@@ -3,7 +3,7 @@ Note: The Final_R_Code.Rmd produce the highest imputation accuary
 
 Column information:
 
-each row of the training data indicates the results of an internet speed test conducted at a location in Canada
+Each row of the training data indicates the results of an internet speed test conducted at a location in Canada
 
 V01 - avg_d_kbps: average download speed recorded
 
