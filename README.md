@@ -25,6 +25,6 @@ V11/V12/V13/V14 - DA_POP, PCUID, PCTYPE, PCCLASS - Further IDs related to how ru
 
 
 # Methods
-V1 - v5, V11: MICE
+V1 - V5, V11: MICE
 V6, V7, V10: Check if previous and next value is the same, if not, refer to V8 or V9.
 V8, V9, V12, V13, V14: replace with the nearest filled value.
