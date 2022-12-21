@@ -28,3 +28,5 @@ V11/V12/V13/V14 - DA_POP (Dissemination area population, integer or NaN), PCUID 
 V1 - V5, V11: MICE
 V6, V7, V10: Check if previous and next value is the same, if not, refer to V8 or V9.
 V8, V9, V12, V13, V14: replace with the nearest filled value.
+
+# Report
