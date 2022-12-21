@@ -30,3 +30,5 @@ V6, V7, V10: Check if previous and next value is the same, if not, refer to V8 o
 V8, V9, V12, V13, V14: replace with the nearest filled value.
 
 # Report
+
+<img width="500" alt="Screen Shot 2022-12-20 at 10 15 29 PM" src="https://user-images.githubusercontent.com/37996767/208835525-9333e540-4c09-4226-a751-25909f000b55.png">
