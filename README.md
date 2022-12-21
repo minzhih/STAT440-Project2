@@ -21,7 +21,7 @@ V07/V08/V09 - PRUID (Province 2 digit id), CDUID (Census division id), DAUID (Di
 
 V10 - SACTYPE - This is an indicator of how rural the area tested is.
 
-V11/V12/V13/V14 - DA_POP, PCUID, PCTYPE, PCCLASS - Further IDs related to how rural the area tested is.
+V11/V12/V13/V14 - DA_POP (Dissemination area population, integer or NaN), PCUID (Population centre id), PCTYPE (Population centre type), PCCLASS (Population centre class) - Further IDs related to how rural the area tested is.
 
 
 # Methods
